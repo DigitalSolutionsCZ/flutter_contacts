@@ -151,10 +151,11 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
         break;
       } case "openContactForm": {
         final boolean localizedLabels = call.argument("androidLocalizedLabels");
+        final Contact contact = Contact.fromMap((HashMap)call.argument("contact"));
         if (delegate != null) {
           delegate.setResult(result);
           delegate.setLocalizedLabels(localizedLabels);
-          delegate.openContactForm();
+          delegate.openContactForm(contact);
         } else {
           result.success(FORM_COULD_NOT_BE_OPEN);
         }
@@ -326,6 +327,18 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
       try {
         Intent intent = new Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI);
         intent.putExtra("finishActivityOnSaveCompleted", true);
+        if (contact != null) {
+          intent.putExtra(ContactsContract.Intents.Insert.NAME, contact.givenName + ' ' + contact.familyName);
+          intent.putExtra(ContactsContract.Intents.Insert.COMPANY, contact.company);
+          for (Item item : contact.phones) {
+            intent.putExtra(ContactsContract.Intents.Insert.PHONE, item.value);
+            intent.putExtra(ContactsContract.Intents.Insert.PHONE_TYPE, Phone.TYPE_WORK);
+          }
+          for (Item item : contact.emails) {
+            intent.putExtra(ContactsContract.Intents.Insert.EMAIL, item.value);
+          }
+          intent.putExtra(ContactsContract.Intents.Insert.EMAIL_TYPE, Email.TYPE_WORK);
+        }
         startIntent(intent, REQUEST_OPEN_CONTACT_FORM);
       }catch(Exception e) {
       }

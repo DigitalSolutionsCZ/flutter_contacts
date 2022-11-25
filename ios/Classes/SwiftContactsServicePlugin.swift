@@ -81,9 +81,13 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
             }
          case "openContactForm":
             let arguments = call.arguments as! [String:Any]
+            var contact: CNMutableContact? = nil
+            if (arguments["contact"] != nil) {
+                contact = dictionaryToContact(dictionary: arguments["contact"] as! [String : Any])
+            }
             localizedLabels = arguments["iOSLocalizedLabels"] as! Bool
             self.result = result
-            _ = openContactForm()
+            _ = openContactForm(contact: contact)
          case "openExistingContact":
             let arguments = call.arguments as! [String : Any]
             let contact = arguments["contact"] as! [String : Any]
@@ -212,8 +216,7 @@ public class SwiftContactsServicePlugin: NSObject, FlutterPlugin, CNContactViewC
         return ""
     }
 
-    func openContactForm() -> [String:Any]? {
-        let contact = CNMutableContact.init()
+    func openContactForm(contact : CNMutableContact? = CNMutableContact.init()) -> [String:Any]? {
         let controller = CNContactViewController.init(forNewContact:contact)
         controller.delegate = self
         DispatchQueue.main.async {
