@@ -323,7 +323,7 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
       }
     }
 
-    void openContactForm() {
+    void openContactForm(Contact contact) {
       try {
         Intent intent = new Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI);
         intent.putExtra("finishActivityOnSaveCompleted", true);
