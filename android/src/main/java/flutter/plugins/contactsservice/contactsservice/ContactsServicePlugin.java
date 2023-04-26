@@ -337,6 +337,27 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
           for (Item item : contact.emails) {
             intent.putExtra(ContactsContract.Intents.Insert.EMAIL, item.value);
           }
+          for (PostalAddress postalAddress : contact.postalAddresses) {
+            String formattedAddress = "";
+            if (postalAddress.street != null) {
+              formattedAddress = postalAddress.street + ", ";
+            }
+            if (postalAddress.city != null) {
+              formattedAddress = formattedAddress + " " + postalAddress.city;
+            }
+            if (postalAddress.region != null) {
+              formattedAddress = formattedAddress + " " + postalAddress.region;
+            }
+            if (postalAddress.postcode != null) {
+              formattedAddress = formattedAddress + " " + postalAddress.postcode;
+            }
+            if (postalAddress.country != null) {
+              formattedAddress = formattedAddress + " " + postalAddress.country;
+            }
+
+            intent.putExtra(ContactsContract.Intents.Insert.POSTAL, formattedAddress);
+            intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE, StructuredPostal.TYPE_WORK);
+          }
           intent.putExtra(ContactsContract.Intents.Insert.EMAIL_TYPE, Email.TYPE_WORK);
         }
         startIntent(intent, REQUEST_OPEN_CONTACT_FORM);
@@ -376,7 +397,7 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
       return null;
     }
   }
-  
+
     private void openDeviceContactPicker(Result result, boolean localizedLabels) {
       if (delegate != null) {
         delegate.setResult(result);
@@ -386,7 +407,7 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
         result.success(FORM_COULD_NOT_BE_OPEN);
       }
   }
-  
+
   private class ContactServiceDelegateOld extends BaseContactsServiceDelegate {
     private final PluginRegistry.Registrar registrar;
 
